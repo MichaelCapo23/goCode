@@ -25,6 +25,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/products", controller.GetProducts(db)).Methods("GET")
+	router.HandleFunc("/products/{id}", controller.GetProduct(db)).Methods("GET")
 
 	fmt.Println("Server running on port 8000")
 
