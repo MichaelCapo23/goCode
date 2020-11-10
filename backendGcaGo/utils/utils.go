@@ -19,7 +19,7 @@ func SendSuccess(w http.ResponseWriter, data interface{}) {
 	json.NewEncoder(w).Encode(data)
 }
 
-func CheckTokenAndParams(headers [2]string, h map[string]string, params []string, r *http.Request, db *sql.DB) (string, bool, bool, map[string]string) {
+func CheckTokenAndParams(headers [2]string, h map[string]string, paramsReq []string, params []string, r *http.Request, db *sql.DB) (string, bool, bool, map[string]string) {
 	//make params map
 	paramsMap := make(map[string]string)
 
@@ -32,13 +32,21 @@ func CheckTokenAndParams(headers [2]string, h map[string]string, params []string
 		}
 	}
 
-	//check the params are set
-	for _, p := range params {
+	//check the required params are set
+	for _, p := range paramsReq {
 		ok := r.FormValue(p)
 		if ok == "" {
 			return p, false, true, paramsMap
 		}
 		paramsMap[p] = ok
+	}
+
+	//check the params are set
+	for _, p := range params {
+		ok := r.FormValue(p)
+		if ok != "" {
+			paramsMap[p] = ok
+		}
 	}
 
 	rows, err := db.Query("SELECT `account_id`, `expiration` FROM `session` WHERE `token` = ?", h["token"])
