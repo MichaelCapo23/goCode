@@ -7,6 +7,7 @@ import (
 
 type ProductRepo struct{}
 
+//GetProductRepo repo function for getting a single product by an id in the route
 func (ps ProductRepo) GetProductsRepo(db *sql.DB, product models.Product, res []models.Product, h map[string]string, p map[string]string) ([]models.Product, error) {
 	//make the query params array
 	valuesArr := make([]interface{}, 0)

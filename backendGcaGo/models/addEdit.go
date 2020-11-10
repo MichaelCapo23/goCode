@@ -1,5 +1,5 @@
 package models
 
-type Error struct {
+type AddEdit struct {
 	Message string `json:"Message"`
 }
