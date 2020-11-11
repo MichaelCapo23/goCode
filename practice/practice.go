@@ -1,44 +1,83 @@
 package main
 
-import (
-	"fmt"
-)
+// func main() {
+// 	c := make(chan string)
+// 	go count("sheep", c)
 
-func getMaxHeight(r int, n int) int {
-	max := r
-	if r < n {
-		max = r
-	} else if n < r {
-		max = n
-	}
-	return max
-}
+// 	for msg := range c {
+// 		fmt.Println(msg)
+// 	}
+// }
 
-//width * max height combo
-func maxArea(height []int) int {
-	//store the first combo in max to save a loop
-	max := 0
+// func count(thing string, c chan string) {
+// 	for i := 1; i <= 5; i++ {
+// 		c <- thing
+// 		time.Sleep(time.Millisecond * 500)
+// 	}
 
-	//loop over the array, keep track of max area
-	for index, row := range height {
+// 	close(c)
+// }
 
-		//loop over the rest of the array after the current index
-		for index2, next := range height[index+1 : len(height)] {
-			//get the next number to get calcs from
-			maxHeight := getMaxHeight(row, next)
-			currentWidth := index2 + 1
-			value := maxHeight * currentWidth
+// func main() {
+// 	c1 := make(chan string)
+// 	c2 := make(chan string)
 
-			if value > max {
-				max = value
-			}
-		}
-	}
+// 	go func() {
+// 		for {
+// 			c1 <- "Every 500"
+// 			time.Sleep(time.Millisecond * 500)
+// 		}
+// 	}()
 
-	return max
-}
+// 	go func() {
+// 		for {
+// 			c2 <- "Every 2 seconds"
+// 			time.Sleep(time.Second * 2)
+// 		}
+// 	}()
+
+// 	for {
+// 		select {
+// 		case msg1 := <-c1:
+// 			fmt.Println(msg1)
+// 		case msg2 := <-c2:
+// 			fmt.Println(msg2)
+// 		}
+// 	}
+// }
+
+// func main() {
+// 	jobs := make(chan int, 100)
+// 	results := make(chan int, 100)
+
+// 	go worker(jobs, results)
+// 	go worker(jobs, results)
+// 	go worker(jobs, results)
+// 	go worker(jobs, results)
+
+// 	for i := 0; i < 100; i++ {
+// 		jobs <- i
+// 	}
+// 	close(jobs)
+// 	for j := 0; j < 100; j++ {
+// 		fmt.Println(<-results)
+// 	}
+// }
+
+// func worker(jobs <-chan int, results chan<- int) {
+// 	for n := range jobs {
+// 		results <- fib(n)
+// 	}
+// }
+
+// func fib(n int) int {
+// 	if n <= 1 {
+// 		return n
+// 	}
+
+// 	return fib(n-1) + fib(n-2)
+// }
 
 func main() {
-	digits := []int{1, 8, 6, 2, 5, 4, 8, 3, 7}
-	fmt.Println(maxArea(digits))
+
 }

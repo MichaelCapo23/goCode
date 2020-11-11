@@ -3,6 +3,7 @@ package utils
 import (
 	"backendGcaGo/driver"
 	"backendGcaGo/models"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -83,4 +84,34 @@ func checkCount(rows *sql.Rows) (int, models.AuthModel) {
 		count++
 	}
 	return count, authModel
+}
+
+//AddProductPrice adds new rows to the prices table by the new product id
+func AddProductPrice(tx *sql.Tx, c map[string]string, insertID int64, res string, ch chan bool) {
+	cols, vals, valuesArr, stmt, ctx := "", "", make([]interface{}, 0), "", context.Background()
+
+	//loop over each map in the priceArr, build parts of query
+	for key, val := range c {
+		cols += key + ","
+		vals += "?,"
+		valuesArr = append(valuesArr, val)
+	}
+
+	//add last insert id to query and values array here
+	cols += "product_id,"
+	vals += "?,"
+	valuesArr = append(valuesArr, insertID)
+
+	//remove the trailing "," from both variables
+	cols = cols[:len(cols)-1]
+	vals = vals[:len(vals)-1]
+
+	//execute query, rollback if err found
+	stmt = "INSERT INTO `prices` (" + cols + ") VALUES (" + vals + ")"
+	_, err := tx.ExecContext(ctx, stmt, valuesArr...)
+	if err != nil {
+		tx.Rollback()
+		ch <- false
+	}
+	ch <- true
 }

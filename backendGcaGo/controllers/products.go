@@ -108,8 +108,6 @@ func (c Controller) GetProduct(db *sql.DB) http.HandlerFunc {
 
 func (c Controller) AddProducts(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var product models.Product
-
 		paramsReq := []string{"product_name", "category_id", "manufacturer", "description", "priceArr"}
 		params := []string{"image_url", "status", "recommended", "subcategory_id"}
 		token := r.Header.Get("token")
@@ -137,10 +135,52 @@ func (c Controller) AddProducts(db *sql.DB) http.HandlerFunc {
 		repo := repository.ProductRepo{}
 
 		//make default response, will be updated later
-		res, err := repo.AddProductRepo(db, product, headerMap, paramsMap)
+		res, err := repo.AddProductRepo(db, headerMap, paramsMap)
 		if err != nil {
 			err := models.Error{res}
 			utils.SendError(w, 400, err)
+			return
+		}
+
+		//encode our res slice and send it back to the front end
+		utils.SendSuccess(w, res)
+	}
+}
+
+func (c Controller) EditProducts(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		paramsReq := []string{"id"}
+		params := []string{"product_name", "category_id", "manufacturer", "description", "image_url", "status", "recommended", "subcategory_id"}
+		token := r.Header.Get("token")
+		storeID := r.Header.Get("store_id")
+
+		headers := [2]string{"token", "store_id"}
+		headerMap := make(map[string]string)
+		headerMap["store_id"] = storeID
+		headerMap["token"] = token
+
+		r.ParseMultipartForm(0)
+
+		//check required body params are sent, check token and expiration on token
+		missing, ok, auth, paramsMap := utils.CheckTokenAndParams(headers, headerMap, paramsReq, params, r, db)
+		if !auth {
+			err := models.Error{"Invalid session"}
+			utils.SendError(w, 401, err)
+			return
+		} else if !ok {
+			err := models.Error{"Missing " + missing + " parameter"}
+			utils.SendError(w, 422, err)
+			return
+		}
+
+		repo := repository.ProductRepo{}
+
+		//make default response, will be updated later
+		res, err := repo.EditProductRepo(db, headerMap, paramsMap)
+		if err != nil {
+			errMsg := models.Error{res}
+			// driver.LogFatal(err)
+			utils.SendError(w, 400, errMsg)
 			return
 		}
 
