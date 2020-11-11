@@ -28,9 +28,11 @@ func main() {
 	router.HandleFunc("/products", controller.GetProducts(db)).Methods("GET")
 	router.HandleFunc("/products/{id}", controller.GetProduct(db)).Methods("GET")
 	router.HandleFunc("/products", controller.AddProducts(db)).Methods("POST")
-	// router.HandleFunc("/products", controller.GetProducts(db)).Methods("PUT")
+	router.HandleFunc("/products", controller.EditProducts(db)).Methods("PUT")
 
-	//next routes
+	//discounts routes
+	router.HandleFunc("/discounts", controller.GetDiscounts(db)).Methods("GET")
+	// router.HandleFunc("/discounts/{id}", controller.GetDiscount(db)).Methods("GET")
 
 	fmt.Println("Server running on port 8000")
 

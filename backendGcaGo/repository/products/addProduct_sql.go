@@ -2,14 +2,15 @@ package repository
 
 import (
 	"backendGcaGo/driver"
-	"backendGcaGo/models"
+	"backendGcaGo/utils"
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 )
 
 //AddProductRepo function to add new products to the master_products_list table
-func (ps ProductRepo) AddProductRepo(db *sql.DB, product models.Product, h map[string]string, p map[string]string) (string, error) {
+func (ps ProductRepo) AddProductRepo(db *sql.DB, h map[string]string, p map[string]string) (string, error) {
 	//make variables to build query and give values to prepared statement
 	ctx := context.Background()
 	tx, err := db.BeginTx(ctx, nil)
@@ -52,32 +53,16 @@ func (ps ProductRepo) AddProductRepo(db *sql.DB, product models.Product, h map[s
 	//Unmarshal the JSON array of maps set new variable with the results
 	priceArr := make([]map[string]string, 0)
 	json.Unmarshal([]byte(p["priceArr"]), &priceArr)
+
+	//create new channel of type bool
+	ch := make(chan bool, len(priceArr))
+
+	//loop over the priceArr and call a new go route to add each new price, pass the channel to it, if false returned, stop the process, don't commit the previous queries, return the error
 	for _, c := range priceArr {
-		//define the cols and values to build teh query
-		cols, vals, valuesArr, stmt = "", "", nil, ""
-
-		//loop over each map in the priceArr, build parts of query
-		for key, val := range c {
-			cols += key + ","
-			vals += "?,"
-			valuesArr = append(valuesArr, val)
-		}
-
-		//add last insert id to query and values array here
-		cols += "product_id,"
-		vals += "?,"
-		valuesArr = append(valuesArr, insertID)
-
-		//remove the trailing "," from both variables
-		cols = cols[:len(cols)-1]
-		vals = vals[:len(vals)-1]
-
-		//execute query, rollback if err found
-		stmt = "INSERT INTO `prices` (" + cols + ") VALUES (" + vals + ")"
-
-		_, err := tx.ExecContext(ctx, stmt, valuesArr...)
-		if err != nil {
-			tx.Rollback()
+		go utils.AddProductPrice(tx, c, insertID, res, ch)
+		if flag := <-ch; !flag {
+			err := errors.New("Error adding new prices")
+			res = "Error adding new prices"
 			return res, err
 		}
 	}
