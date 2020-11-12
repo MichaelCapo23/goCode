@@ -1,15 +1,12 @@
 package models
 
-import "time"
-
 type Discount struct {
-	ID        int
-	AppUserID int
-	Message   string
-	CreatedAt time.Time
-	Resolved  int
-	FirstName string
-	LastName  string
-	UUID      string
-	Type      string
+	ID              int
+	DiscountID      int
+	ProductQuantity string
+	ProductDiscount float32
+	ProductName     string
+	StartDate       string
+	EndDate         string
+	ProductID       int
 }
