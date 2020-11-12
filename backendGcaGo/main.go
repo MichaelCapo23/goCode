@@ -32,7 +32,8 @@ func main() {
 
 	//discounts routes
 	router.HandleFunc("/discounts", controller.GetDiscounts(db)).Methods("GET")
-	// router.HandleFunc("/discounts/{id}", controller.GetDiscount(db)).Methods("GET")
+	router.HandleFunc("/discounts/{id}", controller.GetDiscount(db)).Methods("GET")
+	router.HandleFunc("/discounts", controller.AddDiscount(db)).Methods("POST")
 
 	fmt.Println("Server running on port 8000")
 

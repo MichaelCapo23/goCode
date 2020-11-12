@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func SendError(w http.ResponseWriter, status int, err models.Error) {
+func SendError(w http.ResponseWriter, status int, err interface{}) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(err)
 }
@@ -68,7 +68,6 @@ func CheckTokenAndParams(headers [2]string, h map[string]string, paramsReq []str
 	c := t.Format("2006-01-02 15:04:05")
 
 	if c > ex {
-		fmt.Println("time err")
 		return "", true, false, paramsMap
 	}
 
