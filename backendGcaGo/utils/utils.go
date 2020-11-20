@@ -6,7 +6,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -28,7 +27,6 @@ func CheckTokenAndParams(headers [2]string, h map[string]string, paramsReq []str
 	for _, c := range headers {
 		ok := h[c]
 		if ok == "" {
-			fmt.Println("in")
 			return "", false, false, paramsMap
 		}
 	}
@@ -110,6 +108,28 @@ func AddProductPrice(tx *sql.Tx, c map[string]string, insertID int64, res string
 	_, err := tx.ExecContext(ctx, stmt, valuesArr...)
 	if err != nil {
 		tx.Rollback()
+		ch <- false
+	}
+	ch <- true
+}
+
+//GetProductNameImg gets the `product_name`, `image_url` to add to res slice of structs
+func GetProductNameImg(db *sql.DB, res []models.Favorite, m models.Favorite, i int, ch chan bool) {
+	//create valuesArr to pass to query
+	valuesArr := make([]interface{}, 0)
+	valuesArr = append(valuesArr, m.ProductID)
+
+	//make query
+	stmt := "SELECT `product_name`, `image_url` FROM `products_master_list` WHERE `id` = ? "
+
+	//create a nullString incase image url is null, then grab and return the string
+	var imgURL sql.NullString
+
+	err := db.QueryRow(stmt, valuesArr...).Scan(&m.ProductName, &imgURL)
+	m.ImageURL = imgURL.String
+	res[i] = m
+
+	if err != nil {
 		ch <- false
 	}
 	ch <- true
