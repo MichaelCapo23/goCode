@@ -37,6 +37,12 @@ func main() {
 	router.HandleFunc("/favorites", controller.AddFavorites(db)).Methods("POST")
 	router.HandleFunc("/favorites", controller.EditFavorites(db)).Methods("PUT")
 
+	//messages
+	router.HandleFunc("/messages", controller.GetMessages(db)).Methods("GET")
+	router.HandleFunc("/messages/{id}", controller.GetMessage(db)).Methods("GET")
+	router.HandleFunc("/messages", controller.AddMessage(db)).Methods("POST")
+	router.HandleFunc("/messages", controller.EditMessage(db)).Methods("PUT")
+
 	fmt.Println("Server running on port 8000")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
