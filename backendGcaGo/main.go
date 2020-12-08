@@ -43,6 +43,9 @@ func main() {
 	router.HandleFunc("/messages", controller.AddMessage(db)).Methods("POST")
 	router.HandleFunc("/messages", controller.EditMessage(db)).Methods("PUT")
 
+	//testing route (route made for testing packages)
+	router.HandleFunc("/test/{id}", controller.Test(db)).Methods("PUT")
+
 	fmt.Println("Server running on port 8000")
 
 	log.Fatal(http.ListenAndServe(":8000", router))
