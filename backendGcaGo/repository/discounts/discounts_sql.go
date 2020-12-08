@@ -46,7 +46,7 @@ func (ds DiscountRepo) GetDiscountsRepo(db *sql.DB, discount models.Discount, re
 	//loop over the models slice
 	for i, d := range models {
 		//pass the db, the current row, a pointer to the response model, the channel and the current loop index
-		go getDiscountPrices(db, d, &res, ch, i)
+		getDiscountPrices(db, d, &res, ch, i)
 
 		//if the pointer value is false, there was an error getting the prices. send back error
 		if flag := <-ch; !flag {
@@ -54,6 +54,7 @@ func (ds DiscountRepo) GetDiscountsRepo(db *sql.DB, discount models.Discount, re
 			return res, err
 		}
 	}
+
 	//close the channel
 	close(ch)
 	return res, nil

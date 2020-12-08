@@ -8,9 +8,9 @@ import (
 	"errors"
 )
 
-type FavoritesRepo struct{}
+// type FavoritesRepo struct{}
 
-func (fs FavoritesRepo) GetFavoritesRepo(db *sql.DB, favorite models.Favorite, res []models.Favorite, h map[string]string, p map[string]string) ([]models.Favorite, error) {
+func (fs FavoritesRepo) GetFavorites(db *sql.DB, favorite models.Favorite, res []models.Favorite, h map[string]string, p map[string]string) ([]models.Favorite, error) {
 	//make the valuesArr to pass to the query
 	valuesArr := make([]interface{}, 0)
 	valuesArr = append(valuesArr, h["store_id"], p["app_user_id"])
